@@ -15,13 +15,23 @@ using System;
 using System.Reflection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
+using Swashbuckle.SwaggerGen.Generator;
 
 namespace AspNet5SQLite
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public IConfigurationRoot Configuration { get; set; }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -31,53 +41,91 @@ namespace AspNet5SQLite
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var connection = Configuration["Production:SqliteConnectionString"];
+            var pathToDoc = Configuration["Swagger:Path"];
 
             services.AddDbContext<DataEventRecordContext>(options =>
                 options.UseSqlite(connection)
             );
             
             services.AddMvc();
-            //services.AddScoped<IBLCService, BLCService>();
-            //services.AddScoped<IDataEventRecordRepository, DataEventRecordRepository>();
+
+            services.AddSwaggerGen();
+            services.ConfigureSwaggerGen(options =>
+            {
+                options.SingleApiVersion(new Info
+                {
+                    Version = "v1",
+                    Title = "Geo Search API",
+                    Description = "A simple api to search using geo location in Elasticsearch",
+                    TermsOfService = "None"
+                });
+                options.IncludeXmlComments(pathToDoc);
+                options.DescribeAllEnumsAsStrings();
+            });
 
             var builder = new ContainerBuilder();
 
 #if NET451
             var myAssembly = Assembly.GetExecutingAssembly();
 #else
-            //var myAssembly = GetExecutingAssembly();
-            // TODO: Remove private reflection when we get this: https://github.com/dotnet/corefx/issues/4146
-            var getEntryAssemblyMethod =
-                typeof(Assembly).GetMethod("GetEntryAssembly", BindingFlags.Static | BindingFlags.NonPublic) ??
-                typeof(Assembly).GetMethod("GetEntryAssembly", BindingFlags.Static | BindingFlags.Public);
-            var myAssembly = getEntryAssemblyMethod.Invoke(obj: null, parameters: Array.Empty<object>()) as Assembly;
+            var myAssembly = Assembly.GetEntryAssembly();
 #endif
             builder.RegisterAssemblyTypes(myAssembly)
                .Where(t => t.Name.EndsWith("Service") || t.Name.EndsWith("Repository"))
                .AsImplementedInterfaces();
-            //builder.RegisterType<MyType>().As<IMyType>();
             builder.Populate(services);
             var container = builder.Build();
             return container.Resolve<IServiceProvider>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        /// <param name="loggerFactory"></param>
          public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
 
             var locOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
             app.UseRequestLocalization(locOptions.Value);
 
             app.UseStaticFiles();
 
-            app.UseMvc();
-        }
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
 
+            app.UseSwaggerGen();
+            app.UseSwaggerUi();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
@@ -89,16 +137,5 @@ namespace AspNet5SQLite
 
             host.Run();
         }
-        /*
-        public static Assembly GetExecutingAssembly()
-        {
-            Assembly asm = null;
-            Type t = typeof(Startup);
-            TypeInfo ti = t.GetTypeInfo();
-            asm = ti.Assembly;
-
-            return asm;
-        }
-        */
     }
 }
