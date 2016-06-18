@@ -1,5 +1,16 @@
 ﻿{
     "Production": {
         "SqliteConnectionString": "Data Source=C:\\git\\damienbod\\AspNet5SQLite\\src\\AspNet5SQLite\\dataeventrecords.sqlite"
+    },
+    "Logging": {
+        "IncludeScopes": false,
+        "LogLevel": {
+            "Default": "Debug",
+            "System": "Information",
+            "Microsoft": "Information"
+        }
+    },
+    "Swagger": {
+        "Path": "C:\\git\\damienbod\\AspNet5SQLite\\src\\AspNet5SQLite\\bin\\Debug\\netcoreapp1.0\\AspNet5SQLite.xml"
     }
 }
