@@ -17,6 +17,9 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
 using Swashbuckle.SwaggerGen.Generator;
 
+using NLog.Web;
+using NLog.Extensions.Logging;
+
 namespace AspNet5SQLite
 {
     /// <summary>
@@ -92,8 +95,15 @@ namespace AspNet5SQLite
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="loggerFactory"></param>
-         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            //add NLog to ASP.NET Core
+            loggerFactory.AddNLog();
+
+            //add NLog.Web
+            app.AddNLogWeb();
+            //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
+            env.ConfigureNLog("nlog.config");
             loggerFactory.AddConsole();
             loggerFactory.AddDebug();
 
