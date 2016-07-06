@@ -31,7 +31,7 @@ namespace AspNet5SQLite.Controllers
         [HttpGet]
         public IEnumerable<DataEventRecord> Get()
         {
-            _logger.LogCritical("::::");
+            _logger.LogInformation("::::");
             return _BLCService.GetAll();
         }
         /// <summary>
@@ -42,7 +42,7 @@ namespace AspNet5SQLite.Controllers
         [HttpGet("{id}")]
         public DataEventRecord Get(long id)
         {
-            _logger.LogCritical("::::");
+            _logger.LogInformation("::::");
             return _BLCService.Get(id);
         }
         /// <summary>
@@ -52,7 +52,7 @@ namespace AspNet5SQLite.Controllers
         [HttpPost]
         public void Post([FromBody]DataEventRecord value)
         {
-            _logger.LogCritical("::::");
+            _logger.LogInformation("::::");
             _BLCService.Post(value);
         }
         /// <summary>
@@ -63,7 +63,7 @@ namespace AspNet5SQLite.Controllers
         [HttpPut("{id}")]
         public void Put(long id, [FromBody]DataEventRecord value)
         {
-            _logger.LogCritical("::::");
+            _logger.LogInformation("::::");
             _BLCService.Put(id, value);
         }
         /// <summary>
@@ -73,7 +73,7 @@ namespace AspNet5SQLite.Controllers
         [HttpDelete("{id}")]
         public void Delete(long id)
         {
-            _logger.LogCritical("::::");
+            _logger.LogInformation("::::");
             _BLCService.Delete(id);
         }
     }

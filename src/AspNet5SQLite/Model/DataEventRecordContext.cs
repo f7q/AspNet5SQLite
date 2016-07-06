@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace AspNet5SQLite.Model

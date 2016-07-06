@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
+using Newtonsoft.Json.Serialization;
 
 using AspNet5SQLite.Services;
 using Autofac;
@@ -15,7 +16,10 @@ using System;
 using System.Reflection;
 using Microsoft.Extensions.PlatformAbstractions;
 using Autofac.Extensions.DependencyInjection;
-using Swashbuckle.SwaggerGen.Generator;
+using Swashbuckle.Swagger;
+using Swashbuckle.Swagger.Model;
+using Swashbuckle.SwaggerUi;
+using Swashbuckle.SwaggerGen;
 
 using NLog.Web;
 using NLog.Extensions.Logging;
@@ -54,11 +58,15 @@ namespace AspNet5SQLite
             var connection = Configuration["Production:SqliteConnectionString"];
             var pathToDoc = Configuration["Swagger:Path"];
 
+            services.AddEntityFrameworkSqlite();
             services.AddDbContext<DataEventRecordContext>(options =>
                 options.UseSqlite(connection)
             );
             
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(options =>
+            {
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
 
             services.AddSwaggerGen();
             services.ConfigureSwaggerGen(options =>
@@ -70,7 +78,7 @@ namespace AspNet5SQLite
                     Description = "A simple api to search using geo location in Elasticsearch",
                     TermsOfService = "None"
                 });
-                options.IncludeXmlComments(pathToDoc);
+                //options.IncludeXmlComments(pathToDoc);
                 options.DescribeAllEnumsAsStrings();
             });
 
@@ -129,7 +137,7 @@ namespace AspNet5SQLite
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseSwaggerGen();
+            app.UseSwagger();
             app.UseSwaggerUi();
         }
         /// <summary>

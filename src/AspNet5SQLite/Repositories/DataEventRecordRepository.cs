@@ -30,7 +30,7 @@ namespace AspNet5SQLite.Repositories
         /// <returns></returns>
         public List<DataEventRecord> GetAll()
         {
-            _logger.LogCritical("Getting a the existing records");
+            _logger.LogInformation("Getting a the existing records");
             return _context.DataEventRecords.ToList();
         }
         /// <summary>
@@ -40,7 +40,7 @@ namespace AspNet5SQLite.Repositories
         /// <returns></returns>
         public DataEventRecord Get(long id)
         {
-            _logger.LogCritical("::::--------------------------");
+            _logger.LogInformation("::::--------------------------");
             return _context.DataEventRecords.First(t => t.Id == id);
         }
         /// <summary>
@@ -50,7 +50,7 @@ namespace AspNet5SQLite.Repositories
         [HttpPost]
         public void Post(DataEventRecord dataEventRecord )
         {
-            _logger.LogCritical("::::--------------------------");
+            _logger.LogInformation("::::--------------------------");
             _context.DataEventRecords.Add(dataEventRecord);
             _context.SaveChanges();
         }
@@ -61,7 +61,7 @@ namespace AspNet5SQLite.Repositories
         /// <param name="dataEventRecord"></param>
         public void Put(long id, [FromBody]DataEventRecord dataEventRecord)
         {
-            _logger.LogCritical("::::--------------------------");
+            _logger.LogInformation("::::--------------------------");
             _context.DataEventRecords.Update(dataEventRecord);
             _context.SaveChanges();
         }
@@ -71,7 +71,7 @@ namespace AspNet5SQLite.Repositories
         /// <param name="id"></param>
         public void Delete(long id)
         {
-            _logger.LogCritical("::::--------------------------");
+            _logger.LogInformation("::::--------------------------");
             var entity = _context.DataEventRecords.First(t => t.Id == id);
             _context.DataEventRecords.Remove(entity);
             _context.SaveChanges();
